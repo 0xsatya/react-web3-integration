@@ -18,6 +18,7 @@ function WalletConnect() {
   const [personalWalletBalance, setPersonalWalletBalance] = useState(0);
   const [transferAmount, setTransferAmount] = useState(0.1);
   const [provider, setProvider] = useState();
+  const [modalProvider, setModalProvider] = useState();
   const [signer, setSigner] = useState();
   const [networkData, setNetworkData] = useState({});
   const [txnStatus, setTxnStatus] = useState("");
@@ -67,9 +68,13 @@ function WalletConnect() {
   };
 
   const createWalletInstance = async () => {
-    const instance = await web3Modal.connect();
+    const _modalProvider = await web3Modal.connect();
 
-    const web3Prov = new ethers.providers.Web3Provider(instance);
+    const web3Prov = new ethers.providers.Web3Provider(_modalProvider);
+    setModalProvider(_modalProvider);
+    if (modalProvider) unsubscribeProviderEvents(modalProvider);
+    subscribeProviderEvents(_modalProvider);
+
     // const web3Prov = new Web3Provider(provider1);
     const signer1 = web3Prov.getSigner();
 
@@ -88,6 +93,35 @@ function WalletConnect() {
       setCustodianWalletBalance(cWallBal);
     }
   };
+
+  const unsubscribeProviderEvents = (_provider) => {
+    console.log("Unsubscribing events...");
+  };
+
+  const subscribeProviderEvents = (_provider) => {
+    console.log("Subscribing events...");
+
+    // Subscribe to accounts change
+    _provider.on("accountsChanged", (accounts) => {
+      console.log("subscribeProviderEvents:accountsChanged:", accounts);
+    });
+
+    // Subscribe to chainId change
+    _provider.on("chainChanged", (chainId) => {
+      console.log("subscribeProviderEvents:chainChanged:", chainId);
+    });
+
+    // Subscribe to provider connection
+    _provider.on("connect", (info) => {
+      console.log("subscribeProviderEvents:connect:", info);
+    });
+
+    // Subscribe to provider disconnection
+    _provider.on("disconnect", (error) => {
+      console.log("subscribeProviderEvents:disconnect:", error);
+    });
+  };
+
   const transferFunds = async () => {
     try {
       console.log("Transfer wallet, amount :", custodianWallet, transferAmount);
@@ -106,10 +140,6 @@ function WalletConnect() {
       };
       setTxnStatus("adding funds...");
       let txn = await signer.sendTransaction(tx);
-      // .then((transaction) => {
-      //     console.dir(transaction);
-      //     alert("Send finished!");
-      // });
       await txn.wait();
       console.log("Funds sent successful :", txn);
       cWallBal = ethers.utils.formatEther(await provider.getBalance(custodianWallet));
