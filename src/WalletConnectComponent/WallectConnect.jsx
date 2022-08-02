@@ -122,6 +122,34 @@ function WalletConnect() {
     });
   };
 
+  // useEffect(() => {
+  //   if (provider?.on) {
+  //     const handleAccountsChanged = (accounts) => {
+  //       setAccounts(accounts);
+  //     };
+
+  //     const handleChainChanged = (chainId) => {
+  //       setChainId(chainId);
+  //     };
+
+  //     const handleDisconnect = () => {
+  //       disconnect();
+  //     };
+
+  //     provider.on("accountsChanged", handleAccountsChanged);
+  //     provider.on("chainChanged", handleChainChanged);
+  //     provider.on("disconnect", handleDisconnect);
+
+  //     return () => {
+  //       if (provider.removeListener) {
+  //         provider.removeListener("accountsChanged", handleAccountsChanged);
+  //         provider.removeListener("chainChanged", handleChainChanged);
+  //         provider.removeListener("disconnect", handleDisconnect);
+  //       }
+  //     };
+  //   }
+  // }, [provider]);
+
   const transferFunds = async () => {
     try {
       console.log("Transfer wallet, amount :", custodianWallet, transferAmount);
