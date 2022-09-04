@@ -29,6 +29,8 @@ contract ERC1155TieredSmartContract is ERC1155Supply, Ownable, ReentrancyGuard {
 
     string baseURI = "https://gateway.pinata.cloud/ipfs/";
 
+    address public collectionOwner;
+
     //_maxTokensSupply is array of count of max tokens count for each tokenId
     constructor(
         string memory _name,
@@ -36,13 +38,15 @@ contract ERC1155TieredSmartContract is ERC1155Supply, Ownable, ReentrancyGuard {
         uint256 _maxSupply,
         string memory _uri,
         uint256[] memory _maxTokensSupply,
-        uint256 _price
+        uint256 _price,
+        address _collectionOwner
     ) ERC1155(_uri) {
         name = _name;
         symbol = _symbol;
         maxSupply = _maxSupply;
         baseURI = _uri;
         price = _price;
+        collectionOwner = _collectionOwner;
         require(
             _maxTokensSupply.length > 0,
             "ERROR: _maxTokensSupply is empty array"
@@ -125,5 +129,22 @@ contract ERC1155TieredSmartContract is ERC1155Supply, Ownable, ReentrancyGuard {
 
     function setPrice(uint256 _price) external onlyOwner {
         price = _price;
+    }
+
+    function setCollectionOwner(address _collectionOwner) public {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        collectionOwner = _collectionOwner;
+    }
+
+    function withdrawFunds() external nonReentrant {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
     }
 }

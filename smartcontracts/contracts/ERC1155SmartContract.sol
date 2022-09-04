@@ -26,12 +26,15 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
 
     string baseURI = "https://gateway.pinata.cloud/ipfs/";
 
+    address public collectionOwner;
+
     constructor(
         string memory _name,
         string memory _symbol,
         uint256 _maxSupply,
         string memory _uri,
-        uint256 _price
+        uint256 _price,
+        address _collectionOwner
     ) ERC1155(_uri) {
         // _mint(msg.sender, GOLD, 10**18, "");
         name = _name;
@@ -39,6 +42,7 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
         maxSupply = _maxSupply;
         baseURI = _uri;
         price = _price;
+        collectionOwner = _collectionOwner;
         addMinter(msg.sender);
     }
 
@@ -118,5 +122,22 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
 
     function totalSupply() public view returns (uint256) {
         return _tokenIds.current();
+    }
+
+    function setCollectionOwner(address _collectionOwner) public {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        collectionOwner = _collectionOwner;
+    }
+
+    function withdrawFunds() external nonReentrant {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
     }
 }

@@ -31,6 +31,8 @@ contract ERC1155GeneratedSmartContract is ERC1155, Ownable, ReentrancyGuard {
     //unrevealedUri is complete path upto json
     string public unRevealedUri;
 
+    address public collectionOwner;
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -38,7 +40,8 @@ contract ERC1155GeneratedSmartContract is ERC1155, Ownable, ReentrancyGuard {
         string memory _uri,
         bool _isRevealed,
         string memory _unRevealedUri,
-        uint256 _price
+        uint256 _price,
+        address _collectionOwner
     ) ERC1155(_uri) {
         name = _name;
         symbol = _symbol;
@@ -47,6 +50,8 @@ contract ERC1155GeneratedSmartContract is ERC1155, Ownable, ReentrancyGuard {
         isRevealed = _isRevealed;
         unRevealedUri = _unRevealedUri;
         price = _price;
+        collectionOwner = _collectionOwner;
+
         addMinter(msg.sender);
     }
 
@@ -131,5 +136,22 @@ contract ERC1155GeneratedSmartContract is ERC1155, Ownable, ReentrancyGuard {
 
     function setRevealed() public onlyOwner {
         isRevealed = true;
+    }
+
+    function setCollectionOwner(address _collectionOwner) public {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        collectionOwner = _collectionOwner;
+    }
+
+    function withdrawFunds() external nonReentrant {
+        require(
+            msg.sender == collectionOwner,
+            "Owner collection owner can change owner"
+        );
+        (bool success, ) = msg.sender.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
     }
 }
