@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 function Mint() {
   const [signer, setSigner] = useState();
   // const [nftAddress, setNftAddress] = useState("0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511");
-  const [nftAddress, setNftAddress] = useState("0x4B231F3D48196edb27F7F19F65632D4876D64c4E");
+  const [nftAddress, setNftAddress] = useState("0x5D9e775DCA86b65373Fbb041C0641408D3BFafc1");
   const [tokenId, setTokenId] = useState();
 
   //NOTE: added pricing
@@ -63,6 +63,39 @@ function Mint() {
     }
   };
 
+  const withdraw = async () => {
+    // nftAddress in ropstein = 0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511
+    console.log("Minting NFT ...");
+    if (!nftAddress) {
+      alert("pls enter nft address");
+      return false;
+    }
+    //TODO: don't use connectMetamask() in production. Use walletConnect component
+    let signer1;
+    if (!signer) {
+      signer1 = await connectMetamask();
+    } else signer1 = signer;
+
+    console.log("Deploying SC ...", signer1);
+    let nftContract = new ethers.Contract(nftAddress, ERC1155SCJson.abi, signer1);
+    let receipientAddress = await signer1.getAddress();
+    console.log("Nft receipient :", receipientAddress);
+
+    //NOTE: added pricing
+    let args = [receipientAddress, { value: ethers.utils.parseEther(price.toString()) }];
+
+    console.log("withdrawing funds..");
+    try {
+      let txn = await nftContract.withdrawFunds();
+      let txnResult = await txn.wait();
+
+      console.log("withdraw funds done...", txnResult);
+    } catch (err) {
+      // console.log("Error while minting :", err);
+      console.log("Message :", err.data.message?.split(":")[1]);
+    }
+  };
+
   return (
     <div className="container">
       <p>
@@ -85,6 +118,9 @@ function Mint() {
       <p>
         <Button variant="primary" name="Mint NFt" value={"Mint Nft"} onClick={mintNft}>
           Mint Nft
+        </Button>
+        <Button variant="primary" name="withdraw" value={"Withdraw"} onClick={withdraw}>
+          withdraw
         </Button>
       </p>
       <p>{tokenId && <span>TokenId:{tokenId}</span>}</p>

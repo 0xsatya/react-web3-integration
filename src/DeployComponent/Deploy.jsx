@@ -35,7 +35,8 @@ function Deploy() {
     //TODO: following is parameter for the ERC1155Smartcontract. for Tiered and Generated SC, use
     // respective args in the order
     //NOTE: added pricing
-    let args = ["MyShipNft", "MSN", 1000, "https://myshipnft.com", ethers.utils.parseEther("1")];
+    let walletAddress = await signer1.getAddress();
+    let args = ["MyShipNft", "MSN", 1000, "https://myshipnft.com", ethers.utils.parseEther("1"), walletAddress];
 
     const nftContract = await nftInstance.deploy(...args);
     console.log("nftContract deploying to address... :", nftContract.address);
