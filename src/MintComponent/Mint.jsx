@@ -95,7 +95,37 @@ function Mint() {
       console.log("Message :", err.data.message?.split(":")[1]);
     }
   };
+  
+  const setPrice = async () => {
+    // nftAddress in ropstein = 0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511
+    console.log("setting new price ...");
+    if (!nftAddress) {
+      alert("pls enter nft address");
+      return false;
+    }
+    //TODO: don't use connectMetamask() in production. Use walletConnect component
+    let signer1;
+    if (!signer) {
+      signer1 = await connectMetamask();
+    } else signer1 = signer;
 
+    let nftContract = new ethers.Contract(nftAddress, ERC1155SCJson.abi, signer1);
+    let receipientAddress = await signer1.getAddress();
+
+    //NOTE: added pricing
+    let args = [{ value: ethers.utils.parseEther(price.toString()) }];
+
+    try {
+      let txn = await nftContract.setPrice(...args);
+      let txnResult = await txn.wait();
+
+      console.log("set price done..", txnResult);
+    } catch (err) {
+      // console.log("Error while stting price:", err);
+      console.log("Message :", err.data.message?.split(":")[1]);
+    }
+  };
+  
   return (
     <div className="container">
       <p>
