@@ -5,6 +5,7 @@ import { ethers } from "ethers";
 function Deploy() {
   const [signer, setSigner] = useState();
   const [nftAddress, setNftAddress] = useState();
+  const [price, setPrice] = useState(0.01);
 
   const connectMetamask = async () => {
     console.log("Connecting to metamask...");
@@ -36,7 +37,14 @@ function Deploy() {
     // respective args in the order
     //NOTE: added pricing
     let walletAddress = await signer1.getAddress();
-    let args = ["MyShipNft", "MSN", 1000, "https://myshipnft.com", ethers.utils.parseEther("1"), walletAddress];
+    let args = [
+      "MyShipNft",
+      "MSN",
+      1000,
+      "https://myshipnft.com",
+      ethers.utils.parseEther(price.toString()),
+      walletAddress,
+    ];
 
     const nftContract = await nftInstance.deploy(...args);
     console.log("nftContract deploying to address... :", nftContract.address);

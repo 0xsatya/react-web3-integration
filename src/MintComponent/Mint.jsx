@@ -1,23 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import ERC1155SCJson from "../abis/ERC1155SmartContract.json";
 import { ethers } from "ethers";
 
-function Mint() {
+const Mint = () => {
   const [signer, setSigner] = useState();
   // const [nftAddress, setNftAddress] = useState("0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511");
-  const [nftAddress, setNftAddress] = useState("0x5D9e775DCA86b65373Fbb041C0641408D3BFafc1");
+  const [nftAddress, setNftAddress] = useState("0xD53bcCd91d8F0200D431AD48264a2fDF3D99C0c8");
   const [tokenId, setTokenId] = useState();
+  const [priceInDollar, setPriceInDollar] = useState();
 
   //NOTE: added pricing
-  const [price, setPrice] = useState(1);
-
+  const [amount, setAmount] = useState(0.01);
+  const [price, setPrice] = useState(0.01);
+  const [newPrice, setNewPrice] = useState(price);
   const connectMetamask = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const signer1 = provider.getSigner();
     setSigner(signer1);
     return signer1;
+  };
+
+  const getContract = async () => {
+    let signer1;
+    if (!signer) {
+      signer1 = await connectMetamask();
+    } else signer1 = signer;
+
+    return new ethers.Contract(nftAddress, ERC1155SCJson.abi, signer1);
   };
 
   const mintNft = async () => {
@@ -39,7 +50,7 @@ function Mint() {
     console.log("Nft receipient :", receipientAddress);
 
     //NOTE: added pricing
-    let args = [receipientAddress, { value: ethers.utils.parseEther(price.toString()) }];
+    let args = [receipientAddress, { value: ethers.utils.parseEther(amount.toString()) }];
 
     console.log("Minting a NFT..");
     try {
@@ -82,7 +93,7 @@ function Mint() {
     console.log("Nft receipient :", receipientAddress);
 
     //NOTE: added pricing
-    let args = [receipientAddress, { value: ethers.utils.parseEther(price.toString()) }];
+    let args = [receipientAddress, { value: ethers.utils.parseEther(amount.toString()) }];
 
     console.log("withdrawing funds..");
     try {
@@ -95,8 +106,8 @@ function Mint() {
       console.log("Message :", err.data.message?.split(":")[1]);
     }
   };
-  
-  const setPrice = async () => {
+
+  const setNftPrice = async () => {
     // nftAddress in ropstein = 0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511
     console.log("setting new price ...");
     if (!nftAddress) {
@@ -104,28 +115,46 @@ function Mint() {
       return false;
     }
     //TODO: don't use connectMetamask() in production. Use walletConnect component
-    let signer1;
-    if (!signer) {
-      signer1 = await connectMetamask();
-    } else signer1 = signer;
 
-    let nftContract = new ethers.Contract(nftAddress, ERC1155SCJson.abi, signer1);
-    let receipientAddress = await signer1.getAddress();
+    let nftContract = await getContract();
 
     //NOTE: added pricing
-    let args = [{ value: ethers.utils.parseEther(price.toString()) }];
+    let args = [ethers.utils.parseEther(newPrice.toString())];
 
     try {
       let txn = await nftContract.setPrice(...args);
       let txnResult = await txn.wait();
-
+      setPrice(newPrice);
       console.log("set price done..", txnResult);
     } catch (err) {
       // console.log("Error while stting price:", err);
       console.log("Message :", err.data.message?.split(":")[1]);
     }
   };
-  
+
+  const getContractNftPrice = async () => {
+    let nftContract = await getContract();
+    const nftPrice = ethers.utils.formatEther(await nftContract.price());
+    console.log("nft Price :", nftPrice);
+    return nftPrice;
+  };
+
+  const getEthPriceInDollars = async (ethAmount) => {
+    return Number(ethAmount) * 1738.68;
+  };
+  const getMaticPriceInDollars = async (maticAmount) => {
+    return Number(maticAmount) * 0.93;
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      let nftPrice = await getContractNftPrice();
+      setPrice(nftPrice);
+      setPriceInDollar(await getEthPriceInDollars(nftPrice));
+    };
+    init();
+  }, []);
+
   return (
     <div className="container">
       <p>
@@ -138,24 +167,42 @@ function Mint() {
         value={nftAddress}
         onChange={(e) => setNftAddress(e.target.value)}
       />
+
+      <Button variant="primary" name="Mint NFt" value={"Mint Nft"} onClick={mintNft}>
+        Mint Nft
+      </Button>
+
       <input
         type="text"
         placeholder="nft price in ethers"
         size="20"
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
       />
+      <Button variant="primary" name="withdraw" value={"Withdraw"} onClick={withdraw}>
+        withdraw
+      </Button>
+
       <p>
-        <Button variant="primary" name="Mint NFt" value={"Mint Nft"} onClick={mintNft}>
-          Mint Nft
-        </Button>
-        <Button variant="primary" name="withdraw" value={"Withdraw"} onClick={withdraw}>
-          withdraw
-        </Button>
+        <input
+          type="text"
+          placeholder="nft price in ethers"
+          size="20"
+          value={newPrice}
+          onChange={(e) => setNewPrice(e.target.value)}
+        />
+        <span> current price : {price} </span>
       </p>
+      <p>
+        <span> NFt price in dollars - ${priceInDollar} </span>
+      </p>
+      <Button variant="primary" name="setPrice" value={"SetPrice"} onClick={setNftPrice}>
+        set nft price
+      </Button>
+
       <p>{tokenId && <span>TokenId:{tokenId}</span>}</p>
     </div>
   );
-}
+};
 
 export default Mint;

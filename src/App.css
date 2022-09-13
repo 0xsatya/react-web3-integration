@@ -39,9 +39,16 @@
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
   background-color: #dddddd;
   min-width: 500px;
   min-height: 5vh;
   border: 1px solid black;
   padding: 5px;
+}
+
+.container > * {
+  margin: 5px;
 }

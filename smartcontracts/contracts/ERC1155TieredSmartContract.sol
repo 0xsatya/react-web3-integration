@@ -16,7 +16,7 @@ contract ERC1155TieredSmartContract is ERC1155Supply, Ownable, ReentrancyGuard {
     uint256 public maxTokenId;
 
     // tracks price of each nft
-    uint256 price;
+    uint256 public price;
 
     //It is max tokens can be generated.
     uint256 public maxSupply;
