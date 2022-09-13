@@ -16,7 +16,7 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
     Counters.Counter private _tokenIds;
 
     // tracks price of each nft
-    uint256 price;
+    uint256 public price;
 
     //It tracks total tokens generated.
     uint256 public maxSupply;
