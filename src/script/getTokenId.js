@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-function getTokenIdfromTxHash(transactionHash) {
+async function getTokenIdfromTxHash(transactionHash) {
   console.log("called :");
   const txReceipt = await ethers.provider.getTransactionReceipt(transactionHash);
   console.log("getTokenIdfromTxHash ~ txReceipt", txReceipt);
