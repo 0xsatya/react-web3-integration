@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
+contract ERC1155SmartContract is Ownable, ReentrancyGuard, ERC1155 {
     string public name;
     string public symbol;
     using Counters for Counters.Counter;
@@ -36,7 +36,6 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
         uint256 _price,
         address _collectionOwner
     ) ERC1155(_uri) {
-        // _mint(msg.sender, GOLD, 10**18, "");
         name = _name;
         symbol = _symbol;
         maxSupply = _maxSupply;
@@ -116,7 +115,11 @@ contract ERC1155SmartContract is ERC1155, Ownable, ReentrancyGuard {
         _setURI(newuri);
     }
 
-    function setPrice(uint256 _price) external onlyOwner {
+    function setPrice(uint256 _price) external {
+        require(
+            msg.sender == collectionOwner,
+            "Only collection owner can change price"
+        );
         price = _price;
     }
 

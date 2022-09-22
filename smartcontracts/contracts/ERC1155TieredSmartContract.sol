@@ -127,7 +127,11 @@ contract ERC1155TieredSmartContract is ERC1155Supply, Ownable, ReentrancyGuard {
         return baseURI;
     }
 
-    function setPrice(uint256 _price) external onlyOwner {
+    function setPrice(uint256 _price) external {
+        require(
+            msg.sender == collectionOwner,
+            "Only collection owner can change price"
+        );
         price = _price;
     }
 

@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 const Mint = () => {
   const [signer, setSigner] = useState();
   // const [nftAddress, setNftAddress] = useState("0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511");
-  const [nftAddress, setNftAddress] = useState("0xD53bcCd91d8F0200D431AD48264a2fDF3D99C0c8");
+  const [nftAddress, setNftAddress] = useState("0x6d71A881a8C81be9D381431D0B9b737F26598406");
   const [tokenId, setTokenId] = useState();
   const [priceInDollar, setPriceInDollar] = useState();
 
@@ -127,7 +127,7 @@ const Mint = () => {
       setPrice(newPrice);
       console.log("set price done..", txnResult);
     } catch (err) {
-      // console.log("Error while stting price:", err);
+      console.log("Error while stting price:", err);
       console.log("Message :", err.data.message?.split(":")[1]);
     }
   };

@@ -130,7 +130,11 @@ contract ERC1155GeneratedSmartContract is ERC1155, Ownable, ReentrancyGuard {
         return _tokenIds.current();
     }
 
-    function setPrice(uint256 _price) external onlyOwner {
+    function setPrice(uint256 _price) external {
+        require(
+            msg.sender == collectionOwner,
+            "Only collection owner can change price"
+        );
         price = _price;
     }
 

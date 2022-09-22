@@ -6,6 +6,7 @@ function Deploy() {
   const [signer, setSigner] = useState();
   const [nftAddress, setNftAddress] = useState();
   const [price, setPrice] = useState(0.01);
+  const [owner, setOwner] = useState("0x22Bf1A3B91fBD2D999C85E7873bd62B2390A7621");
 
   const connectMetamask = async () => {
     console.log("Connecting to metamask...");
@@ -43,7 +44,7 @@ function Deploy() {
       1000,
       "https://myshipnft.com",
       ethers.utils.parseEther(price.toString()),
-      walletAddress,
+      owner,
     ];
 
     const nftContract = await nftInstance.deploy(...args);
@@ -51,6 +52,7 @@ function Deploy() {
     await nftContract.deployed();
     console.log("nftContract deployed succesfuly to address :", nftContract.address);
     setNftAddress(nftContract.address);
+    setOwner(await nftContract.collectionOwner());
   };
 
   return (
@@ -62,6 +64,7 @@ function Deploy() {
         Deploy SC
       </Button>
       <p>{nftAddress && <span>nft deployed to address: {nftAddress}</span>}</p>
+      <p> Owner of NFT: {owner}</p>
     </div>
   );
 }
