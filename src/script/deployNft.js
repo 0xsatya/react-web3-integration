@@ -6,8 +6,14 @@
 const { ethers, ContractFactory } = require("ethers");
 // const { getNodeUrl } = require("./utils");
 const SMART_CONTRACT_1155 = require("./../abis/ERC1155SmartContract.json");
+
+// Polygon testnet Url
 const chainStackWssNodeUrl = "wss://ws-nd-339-253-764.p2pify.com/7bedd18da77a42fe744b83d1f2461e4e";
 const chainStackHttpsNodeUrl = "https://nd-339-253-764.p2pify.com/7bedd18da77a42fe744b83d1f2461e4e";
+
+// Polygon Mainnet Node Url
+// const infuraHttpsNodeUrl = "https://polygon-mainnet.infura.io/v3/d6851b2af1554a7f908cbecb7212e050";
+
 let nftDeployed, accts;
 
 const input = {
@@ -38,6 +44,7 @@ async function main() {
   // console.log("NOdeurl-->", nodeUrl);
   // const provider = new ethers.providers.WebSocketProvider(chainStackWssNodeUrl);
   const provider = new ethers.providers.JsonRpcProvider(chainStackHttpsNodeUrl);
+  // const provider = new ethers.providers.JsonRpcProvider(infuraHttpsNodeUrl);
 
   const wallet = new ethers.Wallet(pvtKey);
   const account = wallet.connect(provider);

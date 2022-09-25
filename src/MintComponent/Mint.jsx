@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import ERC1155SCJson from "../abis/ERC1155SmartContract.json";
 import { ethers } from "ethers";
+import { fetchJson } from "ethers/lib/utils";
 
 const Mint = () => {
   const [signer, setSigner] = useState();
@@ -140,17 +141,33 @@ const Mint = () => {
   };
 
   const getEthPriceInDollars = async (ethAmount) => {
-    return Number(ethAmount) * 1738.68;
+    //https://min-api.cryptocompare.com/documentation?api_key=8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96
+    let cryptoCompareApiKey = "8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96";
+    let price = await (
+      await fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD&api_key=" + cryptoCompareApiKey)
+    ).json();
+    let usdPrice = price.USD ? price.USD : 0.75;
+    console.log("Matic price from api :", price, usdPrice);
+    return Number(ethAmount) * usdPrice;
   };
+
   const getMaticPriceInDollars = async (maticAmount) => {
-    return Number(maticAmount) * 0.93;
+    let cryptoCompareApiKey = "8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96";
+    let price = await (
+      await fetch(
+        "https://min-api.cryptocompare.com/data/price?fsym=MATIC&tsyms=USD&api_key=" + cryptoCompareApiKey
+      )
+    ).json();
+    let usdPrice = price.USD ? price.USD : 0.75;
+    console.log("Matic price from api :", price, usdPrice);
+    return Number(maticAmount) * usdPrice;
   };
 
   useEffect(() => {
     const init = async () => {
       let nftPrice = await getContractNftPrice();
       setPrice(nftPrice);
-      setPriceInDollar(await getEthPriceInDollars(nftPrice));
+      setPriceInDollar(await getMaticPriceInDollars(nftPrice));
     };
     init();
   }, []);

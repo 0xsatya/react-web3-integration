@@ -1,3 +1,13 @@
+# TROUBLE SHOOTING
+
+## HOw to get realtime MATIC/ETH vs USD price
+1. Use getEthPriceInDollars | getMaticPriceInDollars functions at src => MintComponent => Mint.jsx;
+
+## How to resolve "insufficient funds for intrinsic transaction cost" ERROR
+1. Check deployment function at src => script => deployNft.js)
+2. Check chainstackNodeUrl is correct for Mainnet ( different from that of testnet)
+3. Check gasPrice and gasLimit is passed as args while calling deploy.
+
 ## Whats new ##
 
 ## To enable price of nft
@@ -12,3 +22,4 @@
 1. cd smartcontracts
 2. $ yarn compile
 3. copy the abis from artifacts/contracts folder to src/abis
+
