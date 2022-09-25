@@ -1,7 +1,8 @@
 # TROUBLE SHOOTING
 
 ## HOw to get realtime MATIC/ETH vs USD price
-1. Use getEthPriceInDollars | getMaticPriceInDollars functions at src => MintComponent => Mint.jsx;
+1. Get apikey from https://www.cryptocompare.com/api/
+2. Use getEthPriceInDollars | getMaticPriceInDollars functions at src => MintComponent => Mint.jsx;
 
 ## How to resolve "insufficient funds for intrinsic transaction cost" ERROR
 1. Check deployment function at src => script => deployNft.js)

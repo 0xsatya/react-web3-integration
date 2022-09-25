@@ -4,6 +4,9 @@ import ERC1155SCJson from "../abis/ERC1155SmartContract.json";
 import { ethers } from "ethers";
 import { fetchJson } from "ethers/lib/utils";
 
+//https://min-api.cryptocompare.com/documentation?api_key=8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96
+let cryptoCompareApiKey = "8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96";
+
 const Mint = () => {
   const [signer, setSigner] = useState();
   // const [nftAddress, setNftAddress] = useState("0xa56C5fE1C6D94c6f1257d02B437A56F2F15c1511");
@@ -141,8 +144,6 @@ const Mint = () => {
   };
 
   const getEthPriceInDollars = async (ethAmount) => {
-    //https://min-api.cryptocompare.com/documentation?api_key=8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96
-    let cryptoCompareApiKey = "8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96";
     let price = await (
       await fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD&api_key=" + cryptoCompareApiKey)
     ).json();
@@ -152,7 +153,6 @@ const Mint = () => {
   };
 
   const getMaticPriceInDollars = async (maticAmount) => {
-    let cryptoCompareApiKey = "8eeac77adc7db561b9fdc2a5a78180e834f564791f0a27268461c3e8260fdd96";
     let price = await (
       await fetch(
         "https://min-api.cryptocompare.com/data/price?fsym=MATIC&tsyms=USD&api_key=" + cryptoCompareApiKey
@@ -170,7 +170,7 @@ const Mint = () => {
       setPriceInDollar(await getMaticPriceInDollars(nftPrice));
     };
     init();
-  }, []);
+  }, [newPrice]);
 
   return (
     <div className="container">
